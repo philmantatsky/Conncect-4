@@ -1,0 +1,203 @@
+// Phillip Mantatsky 4/16/2025
+// This project is a connect four game in which i create the board and check for rules
+// Red always starts first and yellow is second the user picks a column 1-7 to drop each color into
+// the turns alternate and whichever color has 4 in a row in whichever way wins!
+
+#include <iostream>
+
+using namespace std;
+
+class Board {
+    public:
+        void makeBoard(string board[6][7]); // creates the board
+        bool checkWin(string board[6][7], string color); // checks the win
+        bool checkValidMove(string board[6][7], int move); // checks if each move is valid
+        bool checkTie(string board[6][7]); // checks for tie
+};
+
+// returns true/false and checks for tie
+bool Board::checkTie(string board[6][7]) {
+    // if top row still has a "-" then not full yet
+    for (int j = 0; j < 7; j++) {
+        if (board[0][j] == "-") {
+            return false;
+        }
+    }
+    // else is tie
+    return true;
+}
+
+// returns true or false and checks if each move is valid
+bool Board::checkValidMove(string board[6][7], int move) {
+    // checks to see if move is in range
+    if (move < 0 || move > 6) {
+        return false;
+    }
+    // reutrns true/false if there is a "-" on the top row
+    return (board[0][move] == "-");
+}
+
+// prints the board
+void Board::makeBoard(string board[6][7]) {
+    for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 7; j++) {
+                cout << board[i][j] << " ";
+            }
+            cout << endl;
+        }
+        cout << "=============" << endl;
+        cout << "1 2 3 4 5 6 7 " << endl;
+        cout << endl;
+}
+
+// returns true or false if the win has been achieved
+bool Board::checkWin(string board[6][7], string color) {
+    // check horizontal wins
+    for (int i = 0; i < 6; i++) {
+            for (int j = 0; j <= 7 - 4; j++) {
+                if (board[i][j] == color && board[i][j + 1] == color && board[i][j + 2] == color && board[i][j + 3] == color) {
+                    return true;
+                }
+            }
+        }
+
+    // check vertical wins
+    for (int i = 0; i <= 6 - 4; i++) {
+            for (int j = 0; j < 7; j++) {
+                if (board[i][j] == color && board[i + 1][j] == color && board[i + 2][j] == color && board[i + 3][j] == color) {
+                    return true;
+                }
+            }
+        }
+    
+    // check diagonal wins
+    for (int i = 0; i <= 6 - 4; i++) {
+            for (int j = 0; j <= 7 - 4; j++) {
+                if (board[i][j] == color && board[i + 1][j + 1] == color && board[i + 2][j + 2] == color && board[i + 3][j + 3] == color) {
+                    return true;
+                }
+            }
+        }
+
+    // check diagonal wins
+    for (int i = 3; i < 6; i++) {
+            for (int j = 0; j <= 7 - 4; j++) {
+                if (board[i][j] == color && board[i - 1][j + 1] == color && board[i - 2][j + 2] == color && board[i - 3][j + 3] == color) {
+                    return true;
+                }
+            }
+        }
+    return false;
+}
+
+int main() 
+{
+    string board[6][7]; // initializes the board
+    Board b;
+    bool yTurn = false; // y goes second
+    bool rTurn = true; // r goes first
+    int input = 0; 
+    bool gameOver = false;
+    // initializing a blank board
+    for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 7; j++) {
+                board[i][j] = "-";
+            }
+        }
+    b.makeBoard(board);
+    // main while loop that iterates
+    while (!gameOver && input != -1) {
+        // rTurns loop
+        while (rTurn && input != -1 && !gameOver) {
+            // looping and outputting the board
+            cout << "It is Red's turn." << endl;
+            cout << "In which column would you like to move (-1 to exit)? " << endl;
+            cin >> input;
+            // breaks if user inputs -1
+            if (input == -1) {
+                break;
+            }
+            input -= 1;
+            // checks if move is valid
+            while (!b.checkValidMove(board, input)) {
+                cout << "Invalid move, try again." << endl;
+                cout << "It is Red's turn." << endl;
+                cout << "In which column would you like to move (-1 to exit)? " << endl;
+                cin >> input;
+                if (input == -1) {
+                    return 0;
+                }
+                input -= 1;
+            }
+            // replaces each step with an R
+            for (int i = 5; i >= 0; i--) {
+                    if (board[i][input] == "-") {
+                        board[i][input] = "R";
+                        break;
+                }
+                }
+            // outputs the board
+            b.makeBoard(board);
+            // flips the turns
+            rTurn = false;
+            yTurn = true;
+            // checks if red won
+            gameOver = b.checkWin(board, "R");
+            if (gameOver == true) {
+                cout << "Red Wins!" << endl;
+            }
+            // checks if theres a tie
+            else if (b.checkTie(board)) {
+                cout << "Game over. Tie game." << endl;
+                return 0;
+            }
+        }
+        // y turn
+        while (yTurn && input != -1 && !gameOver) {
+            // looping and outputting the board
+            cout << "It is Yellow's turn." << endl;
+            cout << "In which column would you like to move (-1 to exit)? " << endl;
+            cin >> input;
+            if (input == -1) {
+                break;
+            }
+            input -= 1;
+            // checks if move is valid
+            while (!b.checkValidMove(board, input)) {
+                cout << "Invalid move, try again." << endl;
+                cout << "It is Yellow's turn." << endl;
+                cout << "In which column would you like to move (-1 to exit)? " << endl;
+                cin >> input;
+                if (input == -1) {
+                    return 0;
+                }
+                input -= 1;
+            }
+            // replaces each step with an Y
+            for (int i = 5; i >= 0; i--) {
+                    if (board[i][input] == "-") {
+                        board[i][input] = "Y";
+                        break;
+                }
+            }
+            // prints the board
+            b.makeBoard(board);
+            // flips the turns
+            yTurn = false;
+            rTurn = true;
+            // checks if yellow has won
+            gameOver = b.checkWin(board, "Y");
+            if (gameOver == true) {
+                cout << "Yellow Wins!" << endl;
+            }
+            // checks for tie
+            else if (b.checkTie(board)) {
+                cout << "Game over. Tie game." << endl;
+                return 0;
+            }
+        }
+    }
+    
+
+   return 0;
+}
